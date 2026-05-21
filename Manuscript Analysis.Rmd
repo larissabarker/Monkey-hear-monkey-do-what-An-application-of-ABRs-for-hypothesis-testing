@@ -1,0 +1,194 @@
+---
+title: 'Analysis code: Monkey hear, monkey do what? An application of Automated Behavioural
+  Response systems for hypothesis testing in the world''s smallest monkey'
+author: "Larissa Barker and Sarah Papworth"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+This data-set contains the behavioural responses (vocalisations, fleeing, eating and vigilance) of pygmy marmosets to various audio playback treatments (avian predator vocalisations, human speech, motor boats and control audios) in order to test two behavioural hypotheses. 
+
+We deployed automated behavioural response (ABR) systems recording the feeding trees of 9 pygmy marmoset groups during the 5-week study. Once the camera trap in the ABR system detects movement it starts recording a 2-minute long video and then 10 seconds after the recording begins a 30 or 60 second audio recording was triggered (see stimuli details below) and started playing on an attached speaker. We were able to generate enough successful trials with five of these groups so that their responses to the stimuli could be evaluated for both experiments. Overall, we recorded 1,268 videos and 128 successful experimental trials over two experiments. The first experiment tested the risk-disturbance hypothesis and the playback audio stimuli consisted of avian predator vocalisations, human speech, motor boat and controls (cicadas and blue and yellow macaws) it consisted of 54 playback videos and 70 control videos where no audio was played (124 videos in total) that were analysed. The second experiment explored the distracted prey hypothesis, which postulates that animals are distracted by any stimulus they can perceive, and this distraction can cause them to become more susceptible to predation. We played audio recordings of motor boats and human speech that were spliced with the calls of birds of prey and control audios. Experiment 2 consisted of 74 playback videos. All videos from successful playback experiments from the 5 groups were analysed in the software BORIS (version 7.13), an event logging software for video coding. Please see README file for further breakdown of the files used in the analysis.
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(plyr) 
+library(car) 
+library(lme4) 
+library(ggpubr) 
+library(performance) 
+library(dplyr) 
+library("ggpubr") 
+library("tidyverse") 
+library(glmmTMB) 
+library("Matrix") 
+library(viridis) 
+library(tidyverse) 
+library('psych') 
+library(Rmisc) 
+library(lubridate, warn.conflicts = FALSE) 
+library('MuMIn') 
+library('ggeffects') 
+library('tuneR') 
+library('see') 
+library('patchwork') 
+library(mvtnorm) 
+library(ggcorrplot) 
+library("FactoMineR") 
+library(factoextra)
+library(Hmisc)
+library(lmerPerm) 
+library(permutes) 
+library(buildmer) 
+library(forcats) 
+library(broom.mixed)
+
+PredatorCalls<- read.csv("PredatorCalls.csv")
+Experiment1 <- read.csv("Experiment1.csv")
+Experiment2 <- read.csv("Experiment2.csv")
+Experiment1PCA<- read.csv("Experiment1PCA.csv")
+
+```
+
+
+```{r data releveling, include=FALSE}
+#Data-set re-leveling
+
+Experiment1$Audio<-relevel(as.factor(Experiment1$Audio),"None")
+
+Experiment2$Splice.Audio<-relevel(as.factor(Experiment2$Splice.Audio),"Control")
+Experiment2$Audio.Type<-relevel(as.factor(Experiment2$Audio.Type),"Motor Boat")
+
+PredatorCalls$Audio<-relevel(as.factor(PredatorCalls$Audio),"Predator")
+
+```
+
+Experiment 1 Results
+
+Vocalisations
+
+```{r experiment 1 vocalisations, eval=TRUE, echo= TRUE}
+Experiment1callsNB<- glmer.nb(Calls ~ Audio + scale(TIF) + (1|Group), data = Experiment1)
+calls.II.aov <- car::Anova(Experiment1callsNB, type = 2)
+calls.II.aov
+summary(Experiment1callsNB)
+
+tidy(Experiment1callsNB, conf.int = TRUE, exponentiate = TRUE)
+
+```
+
+Fleeing
+
+```{r experiment 1 fleeing, eval=TRUE, echo= TRUE}
+perm_result <- perm.glmer( Flee ~ Audio + (1 | Group), data = Experiment1)
+summary(perm_result)
+perm_df <- as.data.frame(perm_result)
+print(perm_df)
+
+```
+
+"Eating", "Vigilance" and "Looking at the camera" Analyses
+
+Bonferroni p value is 0.01
+
+```{r experiment 1 behaviours, eval=TRUE, echo= TRUE}
+
+Experiment1EatNB<- glmer.nb(Eat ~ Audio + scale(TIF) + (1|Group), data=Experiment1)
+summary(Experiment1EatNB)
+Anova(Experiment1EatNB,type=2)
+
+Experiment1VigNB<- glmer.nb(Vigilance ~ Audio + scale(TIF) + (1|Group), data=Experiment1)
+summary(Experiment1VigNB)
+Anova(Experiment1VigNB,type=2)
+
+Experiment1LookNB<- glmer.nb(Look ~ Audio + scale(TIF) + (1|Group), data=Experiment1)
+summary(Experiment1LookNB)
+Anova(Experiment1LookNB,type=2)
+
+```
+
+Experiment 2 Results
+
+Vocalisations
+
+```{r experiment 2 vocalisations, eval=TRUE, echo= TRUE}
+Experiment2callsNB<- glmer.nb(Calls ~ Audio.Type*Splice.Audio + scale(TIF) + (1|Group), data = Experiment2)
+calls.II.aov <- car::Anova(Experiment2callsNB, type = 3)
+calls.II.aov
+summary(Experiment2callsNB)
+
+```
+
+Predator call audio playback effect on vocalisations rate across both experiments
+
+```{r predator playback vocalisations, eval=TRUE, echo= TRUE}
+PredatorCallsNB<- glmer.nb(Calls ~ Audio + (1|Group), data=PredatorCalls)
+summary(PredatorCallsNB)
+Anova(PredatorCallsNB,type=2)
+
+tidy(PredatorCallsNB, conf.int = TRUE, exponentiate = TRUE)
+```
+
+
+"Eating" and "Vigilance" Analyses
+
+Bonferroni p value is 0.01
+
+```{r experiment 2 behaviours, eval=TRUE, echo= TRUE}
+Experiment2EatNB<- glmer.nb(Eat ~ Audio.Type*Splice.Audio + scale(TIF) + (1|Group), data=Experiment2)
+summary(Experiment2EatNB)
+Anova(Experiment2EatNB,type=3)
+
+Experiment2VigNB<- glmer.nb(Vigilance ~ Audio.Type*Splice.Audio + scale(TIF) + (1|Group), data=Experiment2)
+summary(Experiment2VigNB)
+Anova(Experiment2VigNB,type=3)
+```
+
+Fleeing 
+
+```{r experiment 2 fleeing, eval=TRUE, echo= TRUE}
+perm_result2 <- perm.glmer(Flee ~ Audio.Type*Splice.Audio + (1 | Group), data = Experiment2)
+summary(perm_result2)
+perm_df2 <- as.data.frame(perm_result2)
+print(perm_df2)
+
+```
+
+PCA on behaviours for Experiment 1
+
+```{r PCA, eval=TRUE, echo= TRUE}
+numerical_PCA1data <- Experiment1PCA[,3:9]
+PCA1data_normalised <- scale(numerical_PCA1data)
+PCA1corr_matrix <- cor(PCA1data_normalised)
+ggcorrplot(PCA1corr_matrix)
+ABR1data.pca <- princomp(PCA1corr_matrix)
+summary(ABR1data.pca)
+ABR1data.pca$loadings[, 1:2]
+fviz_eig(ABR1data.pca, addlabels = TRUE)
+
+```
+
+Models for the behaviours not included in the main text due to poor fits for both Experiment 1 and 2.
+
+```{r Badfitmodels, eval=TRUE, echo= TRUE}
+Experiment1Speaker <- glmer(Speaker ~ Audio + scale(TIF) + (1|Group), data = Experiment1, family=poisson)
+summary(Experiment1Speaker)
+Anova(Experiment1Speaker,type=2)
+
+Experiment1RelaxedNB<- glmer.nb(Relaxed ~ Audio + scale(TIF) + (1|Group), data= Experiment1)
+summary(Experiment1RelaxedNB)
+Anova(Experiment1RelaxedNB,type=2)
+
+Experiment2SpeakerZeroIn<- glmmTMB(Speaker ~ Audio.Type*Splice.Audio + TIF + (1|Group), zi=~., family=poisson, data= Experiment2)
+summary(Experiment2SpeakerZeroIn)
+
+Experiment2LookNB<- glmer.nb(Look ~ Audio.Type*Splice.Audio + TIF + (1|Group), data= Experiment2)
+summary(Experiment2LookNB)
+Anova(Experiment2LookNB,type=3)
+
+Experiment2RelaxedZeroIn<- glmmTMB(Relaxed ~ Audio.Type*Splice.Audio + TIF + (1|Group), zi=~., family=poisson, data=Experiment2)
+summary(Experiment2RelaxedZeroIn)
+Anova(Experiment2RelaxedZeroIn,type=2)
+
+```
