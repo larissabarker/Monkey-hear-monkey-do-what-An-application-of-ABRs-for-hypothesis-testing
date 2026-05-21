@@ -1,7 +1,8 @@
-# Monkey-hear-monkey-do-what-An-application-of-ABRs-for-hypothesis-testing
+# Monkey hear, monkey do what? An application of Automated Behavioural Response systems for hypothesis testing in the world’s smallest monkey
+
 This repository contains the code used to perform the analysis in the manuscript titled "Monkey hear, monkey do what? An application of Automated Behavioural Response systems for hypothesis testing in the world’s smallest monkey"
 
-Theses datasets contains the behavioural responses (vocalisations, fleeing, eating and vigilance) of pygmy marmosets to various audio playback treatments (avian predator vocalisations, human speech, motor boats and control audios) in order to test two behavioural hypotheses.
+Theses datasets contain the behavioural responses (vocalisations, fleeing, eating and vigilance) of pygmy marmosets to various audio playback treatments (avian predator vocalisations, human speech, motor boats and control audios) in order to test two behavioural hypotheses.
 
 <br />
 
@@ -11,7 +12,7 @@ We deployed automated behavioural response (ABR) systems recording the feeding t
 
 #### File: Experiment1.csv
 
-**Description:** the dataset used for the analyses of the first experiment looking at the risk disturbance hypothesis (n=124)
+**Description:** the dataset used for the analysis of the first experiment looking at the risk disturbance hypothesis (n=124)
 
 ##### Variables
 
@@ -29,7 +30,7 @@ We deployed automated behavioural response (ABR) systems recording the feeding t
 
 #### File: Experiment2.csv
 
-**Description:** 
+**Description:** the dataset used for the analysis of the second experiment looking at the distracted prey hypothesis (n=74)
 
 ##### Variables
 
@@ -48,7 +49,8 @@ We deployed automated behavioural response (ABR) systems recording the feeding t
 
 #### File: PredatorCalls.csv
 
-**Description:** the dataset used for the analyses of the second experiment looking at the distracted prey hypothesis (n=74)
+**Description:** the dataset used for the analysis looking at the impact of predator vocalisation playbacks on marmoset vocalisations behaviour across experiment 1 and 2 (n=67)
+
 
 ##### Variables
 
@@ -68,9 +70,9 @@ We deployed automated behavioural response (ABR) systems recording the feeding t
 * Look: total duration (seconds) the focal individual spent looking at the camera trap in the video
 * Speaker: total duration (seconds) the focal individual spent looking at the speaker in the video
 * Vigilance: total duration (seconds) the focal individual spent being vigilant in the video
-* Groom:
-* Interact:
-* Hunt:
+* Groom: total duration (seconds) the focal individual spent grooming in the video 
+* Interact: total duration (seconds) the focal individual interacting with other marmosets in the video
+* Hunt: total duration (seconds) the focal individual spent hunting insects in the video
 
 #### File: Manuscript_Analysis.Rmd
 
@@ -82,4 +84,4 @@ We deployed automated behavioural response (ABR) systems recording the feeding t
 
 #### Code/software
 Raw video recordings were transcribed into behavioural observations in the event logging software BORIS (7.13) and then aggregated into summary variables (e.g., total durations and counts per trial) in R (4.3.2). All analyses were conducted in R (4.3.2). Script used for the statistical analyses as well as all included packages are provided in Manuscript_Analysis.Rmd as a R markdown file. 
-<img width="468" height="645" alt="image" src="https://github.com/user-attachments/assets/838e09de-af76-4734-b3fc-16470845619a" />
+
